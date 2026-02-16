@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
 from flask import Blueprint, request
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from sqlalchemy import inspect
 
 # importando recursos do app.py
@@ -29,12 +30,13 @@ def _list_users():
     ]
 
 @app.route('/', methods=['GET', 'POST'])
-def handle_user():
+@jwt_required() # proteger para pessoas autenticadas
+def list_or_create_user():
     if request.method == 'POST':
         _create_user()
         return {'message': 'User created!'}, HTTPStatus.CREATED
     else:
-        return {'users': _list_users() }
+        return {'identity' :get_jwt_identity(),'users': _list_users() }
 
 @app.route("/<int:user_id>")
 def get_user(user_id):

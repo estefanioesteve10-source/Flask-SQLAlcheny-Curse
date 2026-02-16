@@ -7,6 +7,7 @@ from flask import Flask, current_app
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped
 from sqlalchemy.testing.schema import mapped_column
+from flask_jwt_extended import JWTManager
 
 from flask_migrate import Migrate
 
@@ -16,12 +17,13 @@ class Base(DeclarativeBase):
 
 db = SQLAlchemy(model_class=Base)
 migrate = Migrate()
+jwt = JWTManager()
 
 #criando a tabela User
 class User(db.Model):
     id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
     username: Mapped[str] = mapped_column(sa.Integer, unique=True, nullable=False)
-    active: Mapped[bool] = mapped_column(sa.Boolean, default=True)
+    # active: Mapped[bool] = mapped_column(sa.Boolean, default=True)
 
     def __repr__(self) -> str:
         return f'User(id={self.id!r}, username={self.username!r}'
@@ -53,6 +55,7 @@ def create_app(test_config=None):
     app.config.from_mapping(
         SECRET_KEY='dev',
         SQLALCHEMY_DATABASE_URI='sqlite:///bank.db',
+        JWT_SECRET_KEY = "super-secret",
     )
 
     if test_config is None:
@@ -68,10 +71,14 @@ def create_app(test_config=None):
     db.init_app(app)
     # iniciando a migração
     migrate.init_app(app, db)
+    # iniciando o jwt
+    jwt.init_app(app)
 
     # registro do blueprints
     from src.controllers import user
     app.register_blueprint(user.app)
     from src.controllers import post
     app.register_blueprint(post.app)
+    from src.controllers import auth
+    app.register_blueprint(auth.app)
     return app
