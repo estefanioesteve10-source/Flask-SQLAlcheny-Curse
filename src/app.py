@@ -1,4 +1,5 @@
 import datetime
+from email.policy import default
 
 import click
 import sqlalchemy as sa
@@ -7,16 +8,20 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped
 from sqlalchemy.testing.schema import mapped_column
 
+from flask_migrate import Migrate
+
 
 class Base(DeclarativeBase):
     pass
 
 db = SQLAlchemy(model_class=Base)
+migrate = Migrate()
 
 #criando a tabela User
 class User(db.Model):
     id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
     username: Mapped[str] = mapped_column(sa.Integer, unique=True, nullable=False)
+    active: Mapped[bool] = mapped_column(sa.Boolean, default=True)
 
     def __repr__(self) -> str:
         return f'User(id={self.id!r}, username={self.username!r}'
@@ -61,6 +66,8 @@ def create_app(test_config=None):
     app.cli.add_command(init_db_command)
     # inicializar a extensão
     db.init_app(app)
+    # iniciando a migração
+    migrate.init_app(app, db)
 
     # registro do blueprints
     from src.controllers import user
