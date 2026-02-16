@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
 from flask import Blueprint, request
+from sqlalchemy import inspect
 
 # importando recursos do app.py
 from src.app import User, db
@@ -34,3 +35,33 @@ def handle_user():
         return {'message': 'User created!'}, HTTPStatus.CREATED
     else:
         return {'users': _list_users() }
+
+@app.route("/<int:user_id>")
+def get_user(user_id):
+    user = db.get_or_404(User, user_id)
+    return {
+        "id": user.id,
+        "username": user.username,
+    }
+
+@app.route("/<int:user_id>", methods=["PATCH"])
+def update_user(user_id):
+    user = db.get_or_404(User, user_id)
+    data = request.json
+
+    # if "username" in data:
+    #     user.username = data["username"]
+    #     db.session.commit()
+
+    # o inspect para ver quais colunas existem no modelo User
+    mapper = inspect(User)
+    for column in mapper.attrs:
+        # Impede que o ID seja alterado via PATCH
+        if column.key in data and column.key != "id":
+            setattr(user, column.key, data[column.key])
+    db.session.commit()
+
+    return {
+        "id": user.id,
+        "username": user.username,
+    }
