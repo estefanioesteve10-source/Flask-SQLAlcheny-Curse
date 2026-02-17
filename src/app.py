@@ -1,5 +1,7 @@
 import datetime
 from email.policy import default
+import uuid
+from uuid6 import uuid7
 
 import click
 import sqlalchemy as sa
@@ -21,8 +23,8 @@ jwt = JWTManager()
 
 #criando a tabela User
 class User(db.Model):
-    id: Mapped[int] = mapped_column(sa.Integer, primary_key=True)
-    username: Mapped[str] = mapped_column(sa.Integer, unique=True, nullable=False)
+    id: Mapped[uuid.UUID] = mapped_column(sa.Integer, primary_key=True, default=uuid7)
+    username: Mapped[str] = mapped_column(sa.String, unique=True, nullable=False)
     # active: Mapped[bool] = mapped_column(sa.Boolean, default=True)
 
     def __repr__(self) -> str:
