@@ -1,6 +1,6 @@
 # pyproject.toml
 [tool.pytest]
-addopts = ["-ra", "-q"]
+addopts = "-ra -q"
 testpaths = [
     "tests",    # seleciona a pasta de testes
 ]
