@@ -6,6 +6,7 @@ from sqlalchemy import inspect
 
 # importando recursos do app.py
 from src.app import User, db
+from src.controllers.utils import requires_role
 
 app = Blueprint('user', __name__, url_prefix='/users')
 
@@ -39,13 +40,8 @@ def _list_users():
 
 @app.route('/', methods=['GET', 'POST'])
 @jwt_required() # proteger para pessoas autenticadas
+@requires_role('admin')
 def list_or_create_user():
-    user_id = get_jwt_identity()
-    user = db.get_or_404(User, user_id)
-
-    if user.role.name != 'admin':
-        return {"message": "User dont have access"}, HTTPStatus.FORBIDDEN
-
     if request.method == 'POST':
         _create_user()
         return {'message': 'User created!'}, HTTPStatus.CREATED
