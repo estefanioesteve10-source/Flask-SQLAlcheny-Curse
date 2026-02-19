@@ -49,21 +49,31 @@ def list_or_create_user():
         return {'users': _list_users() }
 
 @app.route("/<int:user_id>")
+@jwt_required()
 def get_user(user_id):
+    # Pega o ID do usuário que está fazendo a requisição (do Token)
+    current_user_id = int(get_jwt_identity())
+
+    # Busca o objeto do usuário logado para verificar a Role
+    current_user = db.session.get(User, current_user_id)
+
+    # Lógica de permissão:
+    # Só permite se: (O ID logado == ID da URL) OU (O usuário logado for Admin)
+    if current_user_id != user_id and current_user.role.name != 'admin':
+        return {"message": "Access denied. You can only see your own profile."}, HTTPStatus.FORBIDDEN
+
+    # Se passou no teste, busca os dados do ID solicitado
     user = db.get_or_404(User, user_id)
     return {
         "id": user.id,
         "username": user.username,
+        "role": user.role.name
     }
 
 @app.route("/<int:user_id>", methods=["PATCH"])
 def update_user(user_id):
     user = db.get_or_404(User, user_id)
     data = request.json
-
-    # if "username" in data:
-    #     user.username = data["username"]
-    #     db.session.commit()
 
     # o inspect para ver quais colunas existem no modelo User
     mapper = inspect(User)
