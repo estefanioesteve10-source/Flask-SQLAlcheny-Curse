@@ -1,5 +1,5 @@
 import pytest
-from src.app import create_app
+from src.app import create_app, db
 
 @pytest.fixture()
 def app():
@@ -10,8 +10,10 @@ def app():
             "JWT_SECRET_KEY" : "test",
         }
     )
-    # other setup can go here
-    yield app
+    with app.app_context():
+        db.create_all()
+        # other setup can go here
+        yield app
 
     # clean up / reset resources here
 
