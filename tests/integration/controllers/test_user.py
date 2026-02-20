@@ -1,12 +1,10 @@
 from http import HTTPStatus
-from wsgiref import headers
 
 from flask_jwt_extended import create_access_token
-from pytest_mock import mocker
 
 from src.app import User, db, Role
 
-def test_get_user_sucess(client):
+def test_get_user_sucess(client, admin_headers):
     # Given
     role = Role(name="admin")
     db.session.add(role)
@@ -16,16 +14,9 @@ def test_get_user_sucess(client):
     db.session.add(user)
     db.session.commit()
 
-    # 2. Gerar o Token para o usuário criado
-    # Certifica de que o identity aqui é o que o app espera (ID ou username)
-    access_token = create_access_token(identity=str(user.id))
-    headers = {
-        "Authorization": f"Bearer {access_token}"
-    }
-
     # Where
     # 3. Fazer a requisição com o Header de autorização
-    response = client.get(f"/users/{user.id}", headers=headers)
+    response = client.get(f"/users/{user.id}", headers=admin_headers)
 
     # Then
     assert  response.status_code == HTTPStatus.OK
@@ -34,26 +25,82 @@ def test_get_user_sucess(client):
         "username": user.username,
         "role": user.role.name,  # Mudamos de dicionário para string
     }
+    db.session.remove()
 
 
-def test_get_user_not_found(client):
-    # Given
-    role = Role(name="admin")
-    db.session.add(role)
-    db.session.commit()
-
-    user = User(username="Temp", password="123", role_id=role.id)
-    db.session.add(user)
-    db.session.commit()
+def test_get_user_not_found(client, admin_headers):
 
     user_id = 2
 
-    access_token = create_access_token(identity=str(user.id))
-    headers = {"Authorization": f"Bearer {access_token}"}
-
     # Where
     # 3. Fazer a requisição com o Header de autorização
-    response = client.get(f"/users/{user_id}", headers=headers)
+    response = client.get(f"/users/{user_id}", headers=admin_headers)
 
     # Then
     assert  response.status_code == HTTPStatus.NOT_FOUND
+    db.session.remove()
+
+
+def test_list_users(client, admin_headers):
+
+    query = db.select(User)
+    users = db.session.execute(query).scalars().all()
+
+    # Where
+    # 3. Fazer a requisição com o Header de autorização
+    response = client.get(f"/users/", headers=admin_headers)
+
+    # Then
+    assert  response.status_code == HTTPStatus.OK
+    assert response.json == {
+        'users':[
+                    {
+                        "id": user.id,
+                        "username": user.username,
+                        "role": {
+                            "id": user.role_id,
+                            "name": user.role.name,
+                        }
+                    }
+                ]
+        for user in users
+        }
+    db.session.remove()
+
+
+def test_list_users_fail(client, ):
+    # Given
+    role = Role(name="normal")
+    db.session.add(role)
+    db.session.commit()
+
+    user = User(username = "Vanda3", password = "123456", role_id=role.id)
+    db.session.add(user)
+    db.session.commit()
+
+    # Where
+    # 3. Fazer a requisição com o Header de autorização
+    response = client.get(f"/users/")
+
+    # Then
+    assert  response.status_code == HTTPStatus.UNAUTHORIZED
+    db.session.remove()
+
+
+def test_create_user(client,admin_headers):
+    # Given
+
+    create_user = {
+        "username": "NovoUsuario",
+        "password": "password123",
+        "role_id": 1
+    }
+
+    # Where
+    # 3. Fazer a requisição com o Header de autorização
+    response = client.post(f"/users/", headers=admin_headers, json=create_user)
+
+    # Then
+    assert  response.status_code == HTTPStatus.CREATED
+    assert response.json == {'message': 'User created!'}
+    db.session.remove()

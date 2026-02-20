@@ -1,6 +1,9 @@
 # pyproject.toml
-[tool.pytest]
+[tool.pytest.ini_options]
 addopts = "-ra -q"
-testpaths = [
-    "tests",    # seleciona a pasta de testes
+testpaths = ["tests"]
+filterwarnings = [
+    "ignore::ResourceWarning",
+    "ignore::jwt.exceptions.InsecureKeyLengthWarning",
+    "ignore::pytest.PytestUnraisableExceptionWarning"
 ]
