@@ -1,7 +1,4 @@
 import datetime
-from email.policy import default
-import uuid
-from uuid6 import uuid7
 
 import click
 import sqlalchemy as sa
