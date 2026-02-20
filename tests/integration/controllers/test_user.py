@@ -4,15 +4,9 @@ from flask_jwt_extended import create_access_token
 
 from src.app import User, db, Role
 
-def test_get_user_sucess(client, admin_headers):
+def test_get_user_sucess(client, admin_headers, user_return):
     # Given
-    role = Role(name="admin")
-    db.session.add(role)
-    db.session.commit()
-
-    user = User(username = "Vanda", password = "123456", role_id=role.id)
-    db.session.add(user)
-    db.session.commit()
+    user = user_return
 
     # Where
     # 3. Fazer a requisição com o Header de autorização
@@ -68,15 +62,7 @@ def test_list_users(client, admin_headers):
     db.session.remove()
 
 
-def test_list_users_fail(client, ):
-    # Given
-    role = Role(name="normal")
-    db.session.add(role)
-    db.session.commit()
-
-    user = User(username = "Vanda3", password = "123456", role_id=role.id)
-    db.session.add(user)
-    db.session.commit()
+def test_list_users_fail(client):
 
     # Where
     # 3. Fazer a requisição com o Header de autorização
@@ -87,13 +73,13 @@ def test_list_users_fail(client, ):
     db.session.remove()
 
 
-def test_create_user(client,admin_headers):
+def test_create_user(client,admin_headers,user_return):
     # Given
-
+    user = user_return
     create_user = {
         "username": "NovoUsuario",
         "password": "password123",
-        "role_id": 1
+        "role_id": user.id
     }
 
     # Where

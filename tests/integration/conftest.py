@@ -48,7 +48,9 @@ def user_return(client):
     db.session.add(role)
     db.session.commit()
 
-    user = User(username = "Vanda2", password = "123456", role_id=role.id)
+    user = User(username="Vanda5", password="123456", role_id=role.id)
     db.session.add(user)
     db.session.commit()
-    return user.id
+
+    db.session.refresh(user) # Garante que o objeto tenha os dados atualizados do banco
+    return user # <--- Retorne o objeto, assim user.id funcionará
