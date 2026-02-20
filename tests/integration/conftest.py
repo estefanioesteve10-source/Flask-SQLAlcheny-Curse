@@ -1,4 +1,6 @@
 import pytest
+from flask_jwt_extended import create_access_token
+
 from src.app import create_app, db
 
 @pytest.fixture()
@@ -20,3 +22,9 @@ def app():
 @pytest.fixture()
 def client(app):
     return app.test_client()
+
+@pytest.fixture
+def admin_headers(client):
+    # Lógica simplificada para retornar um header pronto
+    token = create_access_token(identity="1") # ID de um admin fake
+    return {"Authorization": f"Bearer {token}"}
