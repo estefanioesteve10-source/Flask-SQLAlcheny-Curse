@@ -2,19 +2,14 @@
 
 import pytest
 from flask_jwt_extended import create_access_token
-from src.models.models import Role, User
+from src.models.user import User
+from src.models.role import Role
 from src.app import create_app, db
 
 
 @pytest.fixture()
 def app():
-    app = create_app(
-        {
-            "SECRET_KEY":'dev',
-            "SQLALCHEMY_DATABASE_URI":'sqlite://',
-            "JWT_SECRET_KEY" : "test",
-        }
-    )
+    app = create_app( environment="testing" )
     with app.app_context():
         db.create_all()
         # other setup can go here
