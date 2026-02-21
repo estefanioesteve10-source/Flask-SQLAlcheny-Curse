@@ -72,7 +72,7 @@ def get_user(user_id):
 
 @app.route("/<int:user_id>", methods=["PATCH"])
 @jwt_required() # proteger para pessoas autenticadas
-@requires_role('admin')
+@requires_role('name')
 def update_user(user_id):
     user = db.get_or_404(User, user_id)
     data = request.json
