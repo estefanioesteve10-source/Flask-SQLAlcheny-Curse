@@ -2,8 +2,8 @@
 
 import pytest
 from flask_jwt_extended import create_access_token
-
-from src.app import create_app, db, Role, User
+from src.models.models import Role, User
+from src.app import create_app, db
 
 
 @pytest.fixture()

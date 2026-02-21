@@ -3,9 +3,9 @@ from http import HTTPStatus
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from sqlalchemy import inspect
-
+from src.models.user import User
 # importando recursos do app.py
-from src.app import User, db
+from src.models.base import db
 from src.controllers.utils import requires_role
 
 app = Blueprint('user', __name__, url_prefix='/users')

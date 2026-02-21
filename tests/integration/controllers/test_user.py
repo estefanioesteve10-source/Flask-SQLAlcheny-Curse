@@ -1,8 +1,7 @@
 from http import HTTPStatus
 
-from flask_jwt_extended import create_access_token
-
-from src.app import User, db, Role
+from src.models.models import User
+from src.app import db
 
 def test_get_user_sucess(client, admin_headers, user_return):
     # Given

@@ -1,7 +1,6 @@
 from http import HTTPStatus
 
 import pytest
-
 from src.controllers.utils import eleva_quadrado, requires_role
 
 

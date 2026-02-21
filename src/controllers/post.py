@@ -4,7 +4,8 @@ from flask import Blueprint, request
 from sqlalchemy import inspect
 
 # importando recursos do app.py
-from src.app import Post, db
+from src.app import db
+from src.models.post import Post
 
 app = Blueprint('post', __name__, url_prefix='/posts')
 
