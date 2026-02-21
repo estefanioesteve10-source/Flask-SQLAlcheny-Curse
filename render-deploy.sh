@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
 # Sair imediatamente se um comando falhar
+#!/usr/bin/env bash
 set -e
 
-poetry run flask --app src.app db upgrad
+# Instala as dependências
+pip install -r requirements.txt
 
-poetry run  gunicorn src.wsgi:app
+# Roda as migrações (usando o caminho do seu app)
+flask --app src.app db upgrade
+
+# Inicia o Gunicorn apontando para o arquivo wsgi.py que criamos
+gunicorn wsgi:app
