@@ -39,8 +39,8 @@ def _list_users():
     ]
 
 @app.route('/', methods=['GET', 'POST'])
-# @jwt_required() # proteger para pessoas autenticadas
-# @requires_role('admin')
+@jwt_required() # proteger para pessoas autenticadas
+@requires_role('admin')
 def list_or_create_user():
     if request.method == 'POST':
         _create_user()
