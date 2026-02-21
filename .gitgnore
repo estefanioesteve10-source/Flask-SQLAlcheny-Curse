@@ -1,0 +1,14 @@
+# Ambientes Virtuais (O MAIS IMPORTANTE)
+.venv/
+venv/
+env/
+
+# Cache do Python
+**/__pycache__/
+*.py[cod]
+
+# Variáveis de ambiente (Segurança!)
+.env
+
+# IntelliJ/PyCharm
+.idea/
